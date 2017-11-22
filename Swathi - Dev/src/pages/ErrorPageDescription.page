@@ -1,0 +1,84 @@
+<apex:page controller="ErrorPageDescriptionController" sidebar="true">
+   <!-- declaring the styles to use-->  
+    <style>
+        .odd {
+            background-color: #D8D8D8;
+            }
+        .even {
+            background-color: #FFFFFF;
+            }
+        .header {
+            background-color: #FFCC66;
+            }
+    </style>
+
+  <apex:form >
+  	  <apex:actionStatus id="mask">
+	      <apex:facet name="start">
+	           <div id="loadMask" style="width: 100%; height: 100%; border: 1px solid #ccc;opacity: 0.8;position:fixed;" class="waitingSearchDiv waitingSearchDivOpacity" ></div> 
+	           <div style="width: 100%; height: 100%;" class="waitingSearchDiv" id="tableRefreshLoading2">
+	              <div class="waitingHolder" style="top: 450px; width: 77px;">
+	                  <img src="/img/loading.gif" class="waitingImage"/>
+	                  <span class="waitingDescription">Fetching...</span>
+	               </div> 
+	           </div>                
+	      </apex:facet>
+      </apex:actionStatus>
+  	  <!-- The input text is created because the Focus was coming on to the Start Date by default.
+       To avoid that we created this text and gave the border as zero so that it should be invisible -->
+      <input type="text" style="width:0px;height:0px;border:none;background:none;" />
+      <apex:pageBlock mode="edit">
+          <apex:pageBlockSection columns="2" >
+          <!-- script to provide the focus on the Type but this was getting overridden by the Salesforce by default functionality -->
+             <script language="JavaScript"> document.getElementByID('Type').focus(); </script>
+             <apex:outputLabel ></apex:outputLabel>
+             <apex:inputField required="true" id="Type" value="{!errorLog.Type__c}"/>
+             <apex:inputField required="true" id="StartDate" value="{!errorLog.Start_Date__c}">
+                 <!--<apex:actionSupport event="onchange" action="{!fetchInfo}" reRender="exceptionData"/>-->
+             </apex:inputField>
+             <apex:inputField required="true" id="EndDate" value="{!errorLog.End_Date__c}">
+                 <!--<apex:actionSupport event="onchange" action="{!fetchInfo}" reRender="exceptionData"/>-->
+             </apex:inputField>
+         </apex:pageBlockSection>
+         <table width="100%">
+              <tr>
+                  <td align = "center">
+                       <!--  Button been created to send a call at the back end -->
+                       <!-- Rerendering the button will not submit the page and will send an Ajax call -->
+                       <apex:commandButton value="Fetch" action="{!fetchInfo}" status="mask" reRender="exceptionData"/> 
+                  </td>
+              </tr>
+         </table>
+         <!-- output panel to display the result retrieved from the list -->
+         <apex:outputPanel id="exceptionData" >
+         <apex:pageMessages ></apex:pageMessages>
+              <apex:dataTable value="{!lstErrorLog}" var="lstEL" rendered="{!isVisible}" align="center" cellpadding="3px" columns="5" columnsWidth="100px" border="1" rowClasses="odd,even" width="70%">
+                 <apex:column headerValue="Apex Class/ Trigger" headerClass="header">
+                          <apex:outputField value="{!lstEL.Apex_Class_Trigger__c}"/>
+                      </apex:column>
+                      <apex:column headerValue="Object Name" headerClass="header">
+                          <apex:outputField value="{!lstEL.Object_Name__c}"/>
+                      </apex:column>
+                      <apex:column headerValue="Method Name" headerClass="header">
+                          <apex:outputField value="{!lstEL.Method_Name__c}" />
+                      </apex:column>
+                      <apex:column headerValue="Description" headerClass="header">
+                          <apex:outputField value="{!lstEL.Description__c}" />
+                      </apex:column>
+                      <apex:column headerValue="Type" headerClass="header">
+                          <apex:outputField value="{!lstEL.Type__c}" />
+                      </apex:column>
+             </apex:dataTable>
+             <table width="100%">
+                 <tr>
+                     <td align = "center">
+                         <!-- showReport button will send the Ajax call to view the report-->
+                         <apex:commandButton value="Show Report" action="{!showReport}" rendered="{!isVisible}" />
+                     </td>
+                 </tr>
+             </table>
+         </apex:outputPanel>
+     </apex:pageBlock>
+  </apex:form>
+  
+</apex:page>

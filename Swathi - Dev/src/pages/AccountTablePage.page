@@ -1,0 +1,11 @@
+<apex:page StandardController="Account">
+    <apex:form >
+        <apex:pageBlock title="Swathi Account">
+            <apex:pageBlockSection title="Swathi's blog">
+                <apex:outputField value="{!Account.Name}" />
+                <apex:outputField value="{!Account.phone}" />
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

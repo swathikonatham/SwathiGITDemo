@@ -1,0 +1,148 @@
+<apex:page controller="VFC120_ProspectSearchPageController" id="searchDuplicateProspectPage">
+<!-- <apex:page standardController="Prospect__c" extensions="VFC120_ProspectSearchPageController" id="searchDuplicateProspectPage"> ---->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.9.0/jquery-ui.js"></script> 
+<apex:includeScript value="/support/console/37.0/integration.js"/>
+    <style>
+        .progress{
+            color: white;
+            background-color: #bdbd75;
+            border-radius: 4px 0px 0px 0px;
+            padding: 2px;
+            position: absolute;
+        }
+    </style>
+    <!--- <script>
+        var prospectIdListToDelete;
+        function redirectCreatePage(){
+             if (sforce.console.isInConsole()) {
+                 sforce.console.openPrimaryTab(null, '/apex/VFP115_ProspectingPage', true);
+             } else {
+                 window.top.location.href = '/apex/VFP115_ProspectingPage';
+             }
+        }
+        
+        function getProspectsToDelete(checkBox,id){
+            if(checkBox.checked){
+               prospectIdListToDelete.push(id);
+            } else {
+                $.each(prospectIdListToDelete, function(index, value){
+                    if(prospectIdListToDelete[index] === id){
+                        prospectIdListToDelete.splice(index, 1);
+                    }
+                });
+            }
+        }
+        
+        function prepareForDelete(){
+            if(prospectIdListToDelete.length === 0){
+                alert('Please select at least one row');
+                return;
+            }
+            if(confirm('Are you sure you want to delete this prospect.\nThe prospect you have selected has one or more related action items. Are you certain you want to delete the prospect and all related records?')){
+                softDelete(JSON.stringify(prospectIdListToDelete));
+            }
+        }
+        
+        function redirectProspectDetail(prospectId){
+            if (sforce.console.isInConsole()) {
+             sforce.console.openPrimaryTab(null, '/'+prospectId, true);
+            } else {
+             window.top.location.href = '/'+prospectId;
+            }
+        }
+        
+        function init() {
+            prospectIdListToDelete = [];
+        }
+        
+        $(document).ready(function() {
+            init();    
+        });
+    </script>
+  
+  <apex:form id="searchProspectForm">
+    <apex:actionFunction name="softDelete" action="{!softDelete}" oncomplete="init();" rerender="theProspectsRecordsForm, errors" status="requestStatus">
+        <apex:param name="prospectIdListToDelete" assignTo="{!prospectIdListToDelete}" value=""/>
+    </apex:actionFunction>
+    
+    <apex:outputPanel id="errors">
+        <apex:pageMessages />
+    </apex:outputPanel>
+      <apex:pageBlock >
+          <apex:pageBlockButtons location="bottom">
+            <apex:commandButton value="{!$Label.CL00161_ApexCommandButton_value}" action="{!getProspects}" oncomplete="init();" rerender="theProspectsRecordsForm, errors" status="requestStatus"/>
+          </apex:pageBlockButtons>
+          <apex:pageBlockSection title="{!$Label.CL00162_ApexPageBlockSectionTitle}">
+              <apex:inputField value="{!pros.Name}" required="true"/>
+              <apex:inputField value="{!pros.BusinessPhone__c}" required="false"/>
+              <apex:inputField value="{!pros.StreetName__c}" required="false"/>
+              <apex:inputField value="{!pros.State__c}" required="false"/>
+              <apex:inputField value="{!pros.City__c}" required="false"/>
+              <apex:inputField value="{!pros.Zip__c}" required="false"/>
+              <apex:inputField value="{!pros.Contact__c}" />
+          </apex:pageBlockSection>
+      </apex:pageBlock>
+  </apex:form>
+  
+  <apex:form id="theProspectsRecordsForm">
+    <apex:actionStatus id="requestStatus" startText="{!$Label.CL00160_StartText}" stopText="" startStyleClass="progress" />
+    <apex:pageBlock title="{!$Label.CL00163_ApexPageBlockTitle}">
+        <apex:pageBlockButtons >
+            <apex:commandButton value="{!$Label.CL00164_ApexCommandButtonValueDelete}" onclick="prepareForDelete();return false;"/>
+            <apex:commandButton value="{!$Label.CL00165_NewProspect}" rendered="{!newProspectBtnRendered}" onclick="redirectCreatePage();return false;"/>
+        </apex:pageBlockButtons>
+        
+        <apex:pageBlockTable id="prospects-list" value="{!prosWrapperList}" var="row">
+            <apex:column >
+                <apex:facet name="header">Action</apex:facet>
+                <apex:inputCheckbox id="theChkboxForDelete" onchange="getProspectsToDelete(this,'{!row.Id}');" disabled="{!NOT(row.eligibleForDeletion)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.Name.Label}</apex:facet>
+                <apex:outputLink onclick="redirectProspectDetail('{!row.Id}');return false;">{!row.prospectName}</apex:outputLink>
+            </apex:column>           
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.BusinessPhone__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectBusinessPhone}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.Contact__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectContact}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.StreetName__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectStreetName}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.City__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectCity}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.State__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectState}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.Zip__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectZip}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.ReasonCode__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectReasonCode}" />
+            </apex:column>            
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.Status__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectStatus}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.Source__c.Label}</apex:facet>
+                <apex:outputText value="{!row.prospectSource}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$ObjectType.Prospect__c.fields.Deleted__c.Label}</apex:facet>
+                <apex:inputCheckbox value="{!row.prospectDeleted}" disabled="true"/>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+  </apex:form> --->
+</apex:page>
